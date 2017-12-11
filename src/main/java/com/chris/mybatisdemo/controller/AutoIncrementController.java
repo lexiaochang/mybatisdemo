@@ -1,6 +1,7 @@
 package com.chris.mybatisdemo.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.chris.mybatisdemo.base.BaseController;
 import com.chris.mybatisdemo.entity.AutoIncrementEntity;
 import com.chris.mybatisdemo.http.HttpUtils;
 import com.chris.mybatisdemo.service.impl.AutoIncrementServiceImpl;
@@ -25,7 +26,7 @@ import javax.annotation.Resource;
 
 @Controller
 @RequestMapping("/autoincrement")
-public class AutoIncrementController {
+public class AutoIncrementController extends BaseController {
 
     @Resource
     private AutoIncrementServiceImpl mAutoIncrementService;
@@ -49,17 +50,20 @@ public class AutoIncrementController {
 
     @RequestMapping(value = "/selectdata", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
-    public ResponseEntity<String> selectData(@RequestParam Long id) throws Exception {
+    public String selectData(@RequestParam Long id) throws Exception {
         AutoIncrementEntity autoIncrementEntity = mAutoIncrementService.selectData(id);
-        JSONObject json = new JSONObject();
-        try {
-            json.put("name", autoIncrementEntity.getName());
-            json.put("age", autoIncrementEntity.getAge());
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        if (null == autoIncrementEntity.getName() || "".equals(autoIncrementEntity.getName())) {
+            return retContent(2010, null);
+        } else {
+            JSONObject json = new JSONObject();
+            try {
+                json.put("name", autoIncrementEntity.getName());
+                json.put("age", autoIncrementEntity.getAge());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return retContent(200, json);
         }
-        ResponseEntity<String> responseEntity = new ResponseEntity<>(json.toString(), HttpStatus.OK);
-        return responseEntity;
     }
 
     @RequestMapping(value = "/deletedata", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
